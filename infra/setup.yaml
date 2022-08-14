@@ -1,0 +1,31 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: saas-datadog-tf
+spec:
+  interval: 1m
+  url: https://github.com/gofireflyio/saas-apps-sync
+  secretRef:
+    name: basic-access-auth
+  ref:
+    branch: main
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha1
+kind: Terraform
+metadata:
+  name: saas-datadog-tf
+spec:
+  path: ./terraform
+  approvePlan: "auto"
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: saas-datadog-tf
+  writeOutputsToSecret:
+    name: saas-datadog-tf-outputs
+  varsFrom:
+  - kind: Secret
+    name: datadogapikey
+  - kind: Secret
+    name: datadogappkey
